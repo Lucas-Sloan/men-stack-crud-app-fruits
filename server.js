@@ -7,6 +7,7 @@ const mongoose = require("mongoose"); // require package
 const app = express();
 const methodOverride = require("method-override"); // new
 const morgan = require("morgan"); //new
+const path = require("path");
 
 mongoose.connect(process.env.MONGODB_URI);
 mongoose.connection.on("connected", () => {
@@ -17,7 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride("_method")); // new
 app.use(morgan("dev")); //new
 
-
+app.use(express.static(path.join(__dirname, "public")));
 // Import the Fruit model
 const Fruit = require("./models/fruit.js");
 app.use(express.urlencoded({ extended: false }));
@@ -91,7 +92,7 @@ app.put("/fruits/:fruitId", async (req, res) => {
   
     // Redirect to the fruit's show page to see the updates
     res.redirect(`/fruits/${req.params.fruitId}`);
-  });
+});
   
 app.listen(3000, () => {
   console.log("Listening on port 3000");
