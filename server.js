@@ -4,13 +4,19 @@ const dotenv = require("dotenv"); // require package
 dotenv.config(); // Loads the environment variables from .env file
 const express = require("express");
 const mongoose = require("mongoose"); // require package
-
 const app = express();
+const methodOverride = require("method-override"); // new
+const morgan = require("morgan"); //new
 
 mongoose.connect(process.env.MONGODB_URI);
 mongoose.connection.on("connected", () => {
     console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
 });
+
+app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride("_method")); // new
+app.use(morgan("dev")); //new
+
 
 // Import the Fruit model
 const Fruit = require("./models/fruit.js");
@@ -56,6 +62,11 @@ app.post("/fruits", async (req, res) => {
 app.get("/fruits/:fruitId", async (req, res) => {
     const foundFruit = await Fruit.findById(req.params.fruitId);
     res.render("fruits/show.ejs", { fruit: foundFruit });
+});
+
+app.delete("/fruits/:fruitId", async (req, res) => {
+    await Fruit.findByIdAndDelete(req.params.fruitId);
+    res.redirect("/fruits");
 });
   
 app.listen(3000, () => {
